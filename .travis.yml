@@ -5,7 +5,14 @@ python:
 services:
   - docker
 
-before_script: pip install docker-compose
+before_install:
+  - docker version
+  - docker-compose version
+
+before_script:
+  - pip install docker-compose
+  - docker-compose run --user='root' app chmod -R 777 .
 
 script:
-  - docker-compose run app sh -c "python manage.py test && flake8"
+  # - docker-compose run app sh -c "python manage.py test && flake8"
+  - docker-compose run --rm $(bash <(curl -s https://codecov.io/env)) app ash -c "coverage manage.py test && codecov"
